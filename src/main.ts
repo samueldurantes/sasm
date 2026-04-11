@@ -62,7 +62,22 @@ const FIELDS = [
 ] as const;
 
 const DEFAULT_SOURCE = `start:
-    NOP
+  LDI ACC,6
+  LDI R1,4
+  LDI R2,5
+  LDI R3,10
+  MOV AUX,R1
+  ADD ACC,AUX
+  MOV AUX,R2
+  SUB ACC,AUX
+  MOV AUX,R3
+  OR ACC,AUX
+  LDI R1,0
+  LDI R2,0
+  LDI R3,0
+  LDI ACC,0
+  LDI AUX,0
+  NOP
 `;
 
 const editor_parent = document.getElementById("editor") as HTMLDivElement;
