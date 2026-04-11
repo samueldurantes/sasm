@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>sasm</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                background: #ffffff;
+                color: #1f2328;
+                margin: 0;
+                padding: 24px;
+            }
+            h1 {
+                font-size: 18px;
+                margin: 0 0 16px;
+                font-weight: 600;
+            }
+            .layout {
+                display: grid;
+                grid-template-columns: 460px 1fr;
+                gap: 20px;
+                align-items: stretch;
+            }
+            .left {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+            #editor {
+                border: 1px solid #d0d7de;
+                border-radius: 6px;
+                overflow: hidden;
+                background: #ffffff;
+                flex: 1;
+                min-height: 0;
+            }
+            .cm-editor {
+                height: 100%;
+                font-size: 13px;
+            }
+            .cm-editor.cm-focused {
+                outline: none;
+            }
+            button {
+                margin-top: 10px;
+                background: #1f6feb;
+                color: white;
+                border: 0;
+                padding: 8px 16px;
+                border-radius: 6px;
+                cursor: pointer;
+                font:
+                    13px ui-monospace,
+                    monospace;
+            }
+            button:hover {
+                background: #388bfd;
+            }
+            #error {
+                color: #cf222e;
+                margin-top: 10px;
+                white-space: pre-wrap;
+                min-height: 18px;
+            }
+            #table-wrap {
+                overflow-x: auto;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                font-size: 11px;
+                background: #ffffff;
+            }
+            th,
+            td {
+                border: 1px solid #d0d7de;
+                padding: 4px 6px;
+                text-align: center;
+                white-space: nowrap;
+            }
+            th {
+                background: #f6f8fa;
+                position: sticky;
+                top: 0;
+                font-weight: 600;
+                color: #1f2328;
+            }
+            td.on {
+                background: #dbeafe;
+                color: #0a3069;
+                font-weight: 600;
+            }
+            td.off {
+                color: #a0a8b0;
+            }
+            tbody tr:nth-child(even) {
+                background: #f6f8fa;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Stupid assembler</h1>
+        <div class="layout">
+            <div class="left">
+                <div id="editor"></div>
+                <button id="run">Assemble</button>
+                <div id="error"></div>
+            </div>
+            <div id="table-wrap"></div>
+        </div>
+        <script src="dist/bundle.js"></script>
+    </body>
+</html>
