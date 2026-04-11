@@ -226,25 +226,19 @@ export class Assembler {
   }
 
   private format_instruction(instruction: Instruction): string {
-    if (instruction.mnemonic != "nop") {
+    if (!("arg0" in instruction)) {
       return "NOP";
     }
 
     const mn = instruction.mnemonic.toUpperCase();
     const a0 =
-      // @ts-ignore
       typeof instruction.arg0 == "string"
-        ? // @ts-ignore
-          instruction.arg0.toUpperCase()
-        : // @ts-ignore
-          String(instruction.arg0);
+        ? instruction.arg0.toUpperCase()
+        : String(instruction.arg0);
     const a1 =
-      // @ts-ignore
       typeof instruction.arg1 == "string"
-        ? // @ts-ignore
-          instruction.arg1.toUpperCase()
-        : // @ts-ignore
-          String(instruction.arg1);
+        ? instruction.arg1.toUpperCase()
+        : String(instruction.arg1);
     return `${mn} ${a0},${a1}`;
   }
 
