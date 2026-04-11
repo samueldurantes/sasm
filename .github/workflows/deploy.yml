@@ -29,11 +29,18 @@ jobs:
 
       - run: npm run build
 
+      - name: Verify build output
+        run: |
+          ls -la dist
+          test -f dist/bundle.js
+
       - name: Stage site
         run: |
-          mkdir -p _site/dist
+          mkdir -p _site
           cp index.html _site/
-          cp dist/bundle.js _site/dist/
+          cp -r dist _site/dist
+          touch _site/.nojekyll
+          ls -la _site _site/dist
 
       - uses: actions/configure-pages@v5
 
