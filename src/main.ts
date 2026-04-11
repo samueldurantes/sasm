@@ -3,6 +3,8 @@ import { keymap } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { StreamLanguage, StringStream } from "@codemirror/language";
 import { Lexer } from "./tokenizer";
+import { Parser } from "./parser";
+import { Assembler } from "./assembler";
 
 const MNEMONICS = new Set([
   "ldi",
@@ -16,7 +18,7 @@ const MNEMONICS = new Set([
 ]);
 const REGISTERS = new Set(["r1", "r2", "r3", "acc", "aux"]);
 
-const sasmLang = StreamLanguage.define<{}>({
+const sasm_lang = StreamLanguage.define<{}>({
   name: "sasm",
   startState: () => ({}),
   token(stream: StringStream) {
@@ -36,8 +38,6 @@ const sasmLang = StreamLanguage.define<{}>({
     return null;
   },
 });
-import { Parser } from "./parser";
-import { Assembler } from "./assembler";
 
 const FIELDS = [
   "extdataout",
@@ -65,15 +65,18 @@ const DEFAULT_SOURCE = `start:
     NOP
 `;
 
-const editorParent = document.getElementById("editor") as HTMLDivElement;
-const runBtn = document.getElementById("run") as HTMLButtonElement;
-const errorEl = document.getElementById("error") as HTMLDivElement;
-const tableWrap = document.getElementById("table-wrap") as HTMLDivElement;
+const editor_parent = document.getElementById("editor") as HTMLDivElement;
+const run_btn = document.getElementById("run") as HTMLButtonElement;
+const copy_btn = document.getElementById("copy") as HTMLButtonElement;
+const error_el = document.getElementById("error") as HTMLDivElement;
+const table_wrap = document.getElementById("table-wrap") as HTMLDivElement;
+
+let last_results: ReturnType<typeof assemble> = [];
 
 const view = new EditorView({
   doc: DEFAULT_SOURCE,
-  extensions: [basicSetup, keymap.of([indentWithTab]), sasmLang],
-  parent: editorParent,
+  extensions: [basicSetup, keymap.of([indentWithTab]), sasm_lang],
+  parent: editor_parent,
 });
 
 function assemble(source: string) {
@@ -87,10 +90,17 @@ function render(results: ReturnType<typeof assemble>) {
     <thead>
       <tr>
         <th>#</th>
+        <th>instruction</th>
         ${FIELDS.map((f) => `<th>${f}</th>`).join("")}
         <th>opcode</th>
       </tr>
     </thead>`;
+
+  const escape_html = (s: string) =>
+    s.replace(
+      /[&<>]/g,
+      (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]!,
+    );
 
   const rows = results
     .map((r, i) => {
@@ -98,23 +108,42 @@ function render(results: ReturnType<typeof assemble>) {
         const v = (r.microinstructions as Record<string, number>)[f] ?? 0;
         return `<td class="${v ? "on" : "off"}">${v}</td>`;
       }).join("");
-      return `<tr><td>${i}</td>${cells}<td>${r.opcode}</td></tr>`;
+      const instr_cell =
+        i % 2 === 0
+          ? `<td class="instr" rowspan="2">${escape_html(r.instruction)}</td>`
+          : "";
+      return `<tr><td>${i}</td>${instr_cell}${cells}<td>${r.opcode}</td></tr>`;
     })
     .join("");
 
-  tableWrap.innerHTML = `<table>${thead}<tbody>${rows}</tbody></table>`;
+  table_wrap.innerHTML = `<table>${thead}<tbody>${rows}</tbody></table>`;
 }
 
 function run() {
-  errorEl.textContent = "";
+  error_el.textContent = "";
   try {
-    const results = assemble(view.state.doc.toString());
-    render(results);
+    last_results = assemble(view.state.doc.toString());
+    render(last_results);
   } catch (e) {
-    tableWrap.innerHTML = "";
-    errorEl.textContent = (e as Error).message;
+    last_results = [];
+    table_wrap.innerHTML = "";
+    error_el.textContent = (e as Error).message;
   }
 }
 
-runBtn.addEventListener("click", run);
+async function copy_opcodes() {
+  if (!last_results.length) return;
+  const text = last_results.map((r) => r.opcode).join(",");
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = copy_btn.textContent;
+    copy_btn.textContent = "Copied!";
+    setTimeout(() => (copy_btn.textContent = original), 1200);
+  } catch {
+    error_el.textContent = "Failed to copy to clipboard";
+  }
+}
+
+run_btn.addEventListener("click", run);
+copy_btn.addEventListener("click", copy_opcodes);
 run();

@@ -23,6 +23,7 @@ type Microinstruction = {
 };
 
 type R = {
+  instruction: string;
   opcode: number;
   microinstructions: Microinstruction;
 };
@@ -36,6 +37,7 @@ export class Assembler {
 
   mount(): R[] {
     return this.instructions.flatMap((instruction) => {
+      const text = this.format_instruction(instruction);
       const microinstructions: Microinstruction = {
         extdataout: 0,
         r1in: 0,
@@ -75,10 +77,12 @@ export class Assembler {
 
         return [
           {
+            instruction: text,
             microinstructions: mlid0,
             opcode: this.generate_opcode(mlid0),
           },
           {
+            instruction: text,
             microinstructions: mlid1,
             opcode: this.generate_opcode(mlid1),
           },
@@ -98,10 +102,12 @@ export class Assembler {
 
         return [
           {
+            instruction: text,
             microinstructions: mmov0,
             opcode: this.generate_opcode(mmov0),
           },
           {
+            instruction: text,
             microinstructions: mmov1,
             opcode: this.generate_opcode(mmov1),
           },
@@ -126,10 +132,12 @@ export class Assembler {
 
         return [
           {
+            instruction: text,
             microinstructions: m0,
             opcode: this.generate_opcode(m0),
           },
           {
+            instruction: text,
             microinstructions: m1,
             opcode: this.generate_opcode(m1),
           },
@@ -150,10 +158,12 @@ export class Assembler {
 
         return [
           {
+            instruction: text,
             microinstructions: msub0,
             opcode: this.generate_opcode(msub0),
           },
           {
+            instruction: text,
             microinstructions: msub1,
             opcode: this.generate_opcode(msub1),
           },
@@ -163,10 +173,12 @@ export class Assembler {
       if (instruction.mnemonic == "nop") {
         return [
           {
+            instruction: text,
             microinstructions,
             opcode: this.generate_opcode(microinstructions),
           },
           {
+            instruction: text,
             microinstructions,
             opcode: this.generate_opcode(microinstructions),
           },
@@ -211,6 +223,29 @@ export class Assembler {
       parseInt(d15_8, 2) * 256 +
       parseInt(d7_0, 2)
     );
+  }
+
+  private format_instruction(instruction: Instruction): string {
+    if (instruction.mnemonic != "nop") {
+      return "NOP";
+    }
+
+    const mn = instruction.mnemonic.toUpperCase();
+    const a0 =
+      // @ts-ignore
+      typeof instruction.arg0 == "string"
+        ? // @ts-ignore
+          instruction.arg0.toUpperCase()
+        : // @ts-ignore
+          String(instruction.arg0);
+    const a1 =
+      // @ts-ignore
+      typeof instruction.arg1 == "string"
+        ? // @ts-ignore
+          instruction.arg1.toUpperCase()
+        : // @ts-ignore
+          String(instruction.arg1);
+    return `${mn} ${a0},${a1}`;
   }
 
   private number_to_bin(n: string | number) {
