@@ -32,13 +32,11 @@ export class Lexer {
   private col: number = 0;
 
   constructor(source: string) {
-    this.source = source;
+    this.source = source.toLowerCase();
   }
 
   private peek() {
-    return this.source[this.pos]
-      ? this.source[this.pos].toLowerCase()
-      : undefined;
+    return this.source[this.pos] ? this.source[this.pos] : undefined;
   }
 
   private advance() {
@@ -46,7 +44,7 @@ export class Lexer {
 
     if (current_char == "\n") {
       this.line += 1;
-      this.col = 1;
+      this.col = 0;
     } else {
       this.col += 1;
     }
@@ -89,7 +87,8 @@ export class Lexer {
 
       if (ch == "\n") {
         this.advance();
-        if (tokens.length > 0) {
+        const last = tokens[tokens.length - 1];
+        if (tokens.length > 0 && last.kind !== TokenKind.NewLine) {
           tokens.push({ kind: TokenKind.NewLine });
         }
         continue;
@@ -162,7 +161,6 @@ export class Lexer {
         while (this.peek() != "\n" && this.peek() != undefined) {
           this.advance();
         }
-        if (this.peek() == "\n") this.advance();
         continue;
       }
 

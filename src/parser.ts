@@ -61,19 +61,23 @@ export class Parser {
     const instructions: Instruction[] = [];
 
     for (;;) {
+      while (this.peek().kind === TokenKind.NewLine) {
+        this.consume();
+      }
+
       const tk = this.peek();
 
-      if (
-        tk.kind == TokenKind.Eof ||
-        (tk.kind == TokenKind.NewLine &&
-          this.tokens[this.pos + 1].kind == TokenKind.Eof)
-      ) {
+      if (tk.kind === TokenKind.Eof) {
         return instructions;
       }
 
       if (tk.kind == TokenKind.Nop) {
         this.consume();
         instructions.push({ mnemonic: "nop" });
+        if (this.peek().kind === TokenKind.NewLine) {
+          this.consume();
+        }
+        continue;
       }
 
       if (mns.includes(tk.kind)) {
@@ -87,6 +91,8 @@ export class Parser {
           arg0: this.arg_from_token(arg0),
           arg1: this.arg_from_token(arg1),
         });
+      } else {
+        throw new Error(`Unexpected token: ${tk.kind}${tk.value ? ` (${tk.value})` : ""}`);
       }
     }
   }
