@@ -41,7 +41,6 @@ export class Parser {
 
   private parse_instruction(): Instruction[] {
     const mns = [
-      TokenKind.Ldi,
       TokenKind.Mov,
       TokenKind.Add,
       TokenKind.Sub,
@@ -80,11 +79,22 @@ export class Parser {
         continue;
       }
 
-      if (mns.includes(tk.kind)) {
+      if (tk.kind === TokenKind.Ldi) {
         const mn = this.consume();
         const arg0 = this.expect(this.peek().kind, rs);
         this.expect(this.peek().kind, [TokenKind.Comma]);
         const arg1 = this.expect(this.peek().kind, [TokenKind.Number, ...rs]);
+        this.expect(this.peek().kind, [TokenKind.NewLine]);
+        instructions.push({
+          mnemonic: this.mnemonic_from_token(mn),
+          arg0: this.arg_from_token(arg0),
+          arg1: this.arg_from_token(arg1),
+        });
+      } else if (mns.includes(tk.kind)) {
+        const mn = this.consume();
+        const arg0 = this.expect(this.peek().kind, rs);
+        this.expect(this.peek().kind, [TokenKind.Comma]);
+        const arg1 = this.expect(this.peek().kind, rs);
         this.expect(this.peek().kind, [TokenKind.NewLine]);
         instructions.push({
           mnemonic: this.mnemonic_from_token(mn),

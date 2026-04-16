@@ -15,8 +15,9 @@ label       := IDENT ":"
 comment     := ";" { ANY_CHAR }
 instruction := mnemonic [ operand_list ]
 
-operand_list := operand "," operand
-operand      := register | NUMBER
+operand_list  := operand1 "," operand2
+operand1      := register
+operand2      := register | NUMBER
 
 mnemonic := "ldi" | "mov" | "add" | "sub" | "or" | "xor" | "and" | "nop"
 register := "r1" | "r2" | "r3" | "acc" | "aux"
