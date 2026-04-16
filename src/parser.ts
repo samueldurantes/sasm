@@ -84,7 +84,7 @@ export class Parser {
         const arg0 = this.expect(this.peek().kind, rs);
         this.expect(this.peek().kind, [TokenKind.Comma]);
         const arg1 = this.expect(this.peek().kind, [TokenKind.Number, ...rs]);
-        this.expect(this.peek().kind, [TokenKind.NewLine]);
+        this.expect(this.peek().kind, [TokenKind.NewLine, TokenKind.Eof]);
         instructions.push({
           mnemonic: this.mnemonic_from_token(mn),
           arg0: this.arg_from_token(arg0),
@@ -95,7 +95,7 @@ export class Parser {
         const arg0 = this.expect(this.peek().kind, rs);
         this.expect(this.peek().kind, [TokenKind.Comma]);
         const arg1 = this.expect(this.peek().kind, rs);
-        this.expect(this.peek().kind, [TokenKind.NewLine]);
+        this.expect(this.peek().kind, [TokenKind.NewLine, TokenKind.Eof]);
         instructions.push({
           mnemonic: this.mnemonic_from_token(mn),
           arg0: this.arg_from_token(arg0),
