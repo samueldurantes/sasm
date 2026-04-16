@@ -1,7 +1,7 @@
 # sasm — Stupid ASseMbler
 
 A tiny educational assembler for the
-[MSK3 microcontroller](https://circuitverse.org/simulator/embed/mskprocessor3),
+[MSK3 processor](https://circuitverse.org/simulator/embed/mskprocessor3),
 a custom 19-bit microinstruction CPU. Write assembly in the browser, hit
 **Assemble**, and inspect every control signal and the resulting opcode
 side-by-side.
